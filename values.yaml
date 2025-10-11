@@ -1,0 +1,21 @@
+replicaCount: 2
+
+image:
+  repository: my-web-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  app:
+    port: 80
+    targetPort: 80
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  host: example.com
+  groupName: app-group
+  certificateArn: arn:aws:acm:region:account:certificate/your-certificate-id
+  subnets: "" # subnet IDs comma separated
+  healthcheckPath: /health
+  annotations: {}

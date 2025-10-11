@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app.fullname" . }}-app
+  labels:
+    app: {{ include "app.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "app.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "app.name" . }}
+    spec:
+      containers:
+      - name: {{ include "app.name" . }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.app.targetPort }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.ingress.healthcheckPath | default "/health" }}
+            port: {{ .Values.service.app.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.ingress.healthcheckPath | default "/health" }}
+            port: {{ .Values.service.app.targetPort }}
+          initialDelaySeconds: 15
+          periodSeconds: 20
