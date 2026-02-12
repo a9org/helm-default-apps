@@ -19,3 +19,32 @@ ingress:
   subnets: "" # subnet IDs comma separated
   healthcheckPath: /health
   annotations: {}
+
+configMap:
+  enabled: false
+  data: {}
+    # APP_ENV: production
+    # LOG_LEVEL: info
+    # API_URL: https://api.example.com
+
+secret:
+  enabled: false
+  data: {}
+    # DATABASE_PASSWORD: mypassword
+    # API_KEY: myapikey
+
+env:
+  # Variáveis de ambiente diretas
+  plain: []
+    # - name: NODE_ENV
+    #   value: production
+  
+  # Variáveis de ambiente do ConfigMap
+  fromConfigMap: []
+    # - name: APP_ENV
+    #   key: APP_ENV
+  
+  # Variáveis de ambiente do Secret
+  fromSecret: []
+    # - name: DATABASE_PASSWORD
+    #   key: DATABASE_PASSWORD

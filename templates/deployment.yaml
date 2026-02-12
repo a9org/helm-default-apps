@@ -20,6 +20,27 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.app.targetPort }}
+        {{- if or .Values.env.plain .Values.env.fromConfigMap .Values.env.fromSecret }}
+        env:
+        {{- range .Values.env.plain }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        {{- range .Values.env.fromConfigMap }}
+        - name: {{ .name }}
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "app.fullname" $ }}
+              key: {{ .key }}
+        {{- end }}
+        {{- range .Values.env.fromSecret }}
+        - name: {{ .name }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "app.fullname" $ }}
+              key: {{ .key }}
+        {{- end }}
+        {{- end }}
         readinessProbe:
           httpGet:
             path: {{ .Values.ingress.healthcheckPath | default "/health" }}
