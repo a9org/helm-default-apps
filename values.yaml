@@ -50,6 +50,7 @@ initContainer:
   args: []
     # - npm run migrate
   # Variáveis de ambiente específicas do init container
+  # Se vazio, usa as mesmas variáveis da aplicação (env.plain + ConfigMap + Secret)
   env:
     plain: []
       # - name: RUN_MIGRATIONS
