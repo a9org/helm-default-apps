@@ -39,6 +39,22 @@ env:
     # - name: NODE_ENV
     #   value: production
 
+initContainer:
+  # Habilitar init container (usa a mesma imagem da aplicação)
+  enabled: false
+  # Comando a ser executado no init container
+  command: []
+    # - sh
+    # - -c
+  # Argumentos do comando
+  args: []
+    # - npm run migrate
+  # Variáveis de ambiente específicas do init container
+  env:
+    plain: []
+      # - name: RUN_MIGRATIONS
+      #   value: "true"
+
 serviceAccount:
   # Criar ServiceAccount para o pod
   create: false
