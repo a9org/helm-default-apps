@@ -23,25 +23,29 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.app.targetPort }}
-        {{- if or .Values.env.plain .Values.env.fromConfigMap .Values.env.fromSecret }}
+        {{- if or .Values.env.plain .Values.configMap.data .Values.secret.data }}
         env:
         {{- range .Values.env.plain }}
         - name: {{ .name }}
           value: {{ .value | quote }}
         {{- end }}
-        {{- range .Values.env.fromConfigMap }}
-        - name: {{ .name }}
+        {{- if .Values.configMap.enabled }}
+        {{- range $key, $value := .Values.configMap.data }}
+        - name: {{ $key }}
           valueFrom:
             configMapKeyRef:
               name: {{ include "app.fullname" $ }}
-              key: {{ .key }}
+              key: {{ $key }}
         {{- end }}
-        {{- range .Values.env.fromSecret }}
-        - name: {{ .name }}
+        {{- end }}
+        {{- if .Values.secret.enabled }}
+        {{- range $key, $value := .Values.secret.data }}
+        - name: {{ $key }}
           valueFrom:
             secretKeyRef:
               name: {{ include "app.fullname" $ }}
-              key: {{ .key }}
+              key: {{ $key }}
+        {{- end }}
         {{- end }}
         {{- end }}
         readinessProbe:

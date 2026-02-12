@@ -34,20 +34,10 @@ secret:
     # API_KEY: myapikey
 
 env:
-  # Variáveis de ambiente diretas
+  # Variáveis de ambiente diretas (não vêm do ConfigMap ou Secret)
   plain: []
     # - name: NODE_ENV
     #   value: production
-  
-  # Variáveis de ambiente do ConfigMap
-  fromConfigMap: []
-    # - name: APP_ENV
-    #   key: APP_ENV
-  
-  # Variáveis de ambiente do Secret
-  fromSecret: []
-    # - name: DATABASE_PASSWORD
-    #   key: DATABASE_PASSWORD
 
 serviceAccount:
   # Criar ServiceAccount para o pod
