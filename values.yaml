@@ -48,3 +48,10 @@ env:
   fromSecret: []
     # - name: DATABASE_PASSWORD
     #   key: DATABASE_PASSWORD
+
+serviceAccount:
+  # Criar ServiceAccount para o pod
+  create: false
+  # Anotações para associar AWS IAM Role (IRSA)
+  annotations: {}
+    # eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/my-app-role
