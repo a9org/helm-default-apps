@@ -4,8 +4,28 @@ metadata:
   name: {{ include "app.fullname" . }}-app
   labels:
     app: {{ include "app.name" . }}
+    {{- with .Values.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.argocd.imageUpdater.enabled }}
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: {{ include "app.name" . }}={{ .Values.image.repository }}
+    argocd-image-updater.argoproj.io/{{ include "app.name" . }}.update-strategy: {{ .Values.argocd.imageUpdater.strategy }}
+    {{- if .Values.argocd.imageUpdater.constraint }}
+    argocd-image-updater.argoproj.io/{{ include "app.name" . }}.semver.constraint: {{ .Values.argocd.imageUpdater.constraint | quote }}
+    {{- end }}
+    {{- if .Values.argocd.imageUpdater.tagPrefix }}
+    argocd-image-updater.argoproj.io/{{ include "app.name" . }}.allow-tags: regexp:^{{ .Values.argocd.imageUpdater.tagPrefix }}.*
+    {{- end }}
+    {{- if not .Values.argocd.imageUpdater.autoUpdate }}
+    argocd-image-updater.argoproj.io/{{ include "app.name" . }}.update-strategy: latest
+    argocd-image-updater.argoproj.io/write-back-method: git
+    {{- end }}
+  {{- end }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app: {{ include "app.name" . }}
@@ -13,9 +33,21 @@ spec:
     metadata:
       labels:
         app: {{ include "app.name" . }}
+        {{- with .Values.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- if .Values.serviceAccount.create }}
       serviceAccountName: {{ include "app.fullname" . }}
+      {{- end }}
+      {{- if .Values.topologySpreadConstraints.enabled }}
+      topologySpreadConstraints:
+      - maxSkew: {{ .Values.topologySpreadConstraints.maxSkew }}
+        topologyKey: {{ .Values.topologySpreadConstraints.topologyKey }}
+        whenUnsatisfiable: {{ .Values.topologySpreadConstraints.whenUnsatisfiable }}
+        labelSelector:
+          matchLabels:
+            app: {{ include "app.name" . }}
       {{- end }}
       {{- if .Values.initContainer.enabled }}
       initContainers:
@@ -30,7 +62,11 @@ spec:
         args:
           {{- toYaml .Values.initContainer.args | nindent 10 }}
         {{- end }}
-        {{- if or .Values.initContainer.env.plain .Values.env.plain .Values.configMap.enabled .Values.secret.enabled }}
+        {{- if .Values.initContainerResources }}
+        resources:
+          {{- toYaml .Values.initContainerResources | nindent 10 }}
+        {{- end }}
+        {{- if or .Values.initContainer.env.plain .Values.env.plain .Values.configMap.enabled .Values.secret.enabled .Values.secrets.enabled }}
         env:
         {{- if .Values.initContainer.env.plain }}
         {{- range .Values.initContainer.env.plain }}
@@ -69,7 +105,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.app.targetPort }}
-        {{- if or .Values.env.plain .Values.configMap.enabled .Values.secret.enabled }}
+        {{- if or .Values.env.plain .Values.configMap.enabled .Values.secret.enabled .Values.secrets.enabled }}
         env:
         {{- range .Values.env.plain }}
         - name: {{ .name }}
@@ -94,15 +130,29 @@ spec:
         {{- end }}
         {{- end }}
         {{- end }}
+        {{- if .Values.probes.readiness.enabled }}
         readinessProbe:
           httpGet:
-            path: {{ .Values.ingress.healthcheckPath | default "/health" }}
+            path: {{ .Values.probes.readiness.path }}
             port: {{ .Values.service.app.targetPort }}
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+          timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+          successThreshold: {{ .Values.probes.readiness.successThreshold }}
+          failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+        {{- end }}
+        {{- if .Values.probes.liveness.enabled }}
         livenessProbe:
           httpGet:
-            path: {{ .Values.ingress.healthcheckPath | default "/health" }}
+            path: {{ .Values.probes.liveness.path }}
             port: {{ .Values.service.app.targetPort }}
-          initialDelaySeconds: 15
-          periodSeconds: 20
+          initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+          timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+          successThreshold: {{ .Values.probes.liveness.successThreshold }}
+          failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+        {{- end }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- end }}

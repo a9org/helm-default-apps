@@ -5,6 +5,80 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
+# Labels adicionais para pods e deployment
+labels: {}
+  # team: platform
+  # cost-center: engineering
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Resources para o init container
+initContainerResources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable: 1
+
+# Topology Spread Constraints - distribuir pods entre AZs
+topologySpreadConstraints:
+  enabled: false
+  maxSkew: 1
+  topologyKey: topology.kubernetes.io/zone
+  whenUnsatisfiable: ScheduleAnyway
+
+# Configuração de probes
+probes:
+  readiness:
+    enabled: true
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  liveness:
+    enabled: true
+    path: /health
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+argocd:
+  imageUpdater:
+    enabled: false
+    # Estratégia de atualização: semver, latest, digest, name
+    strategy: semver
+    # Constraint semver (ex: ~1.0, ^2.0, >=1.0.0 <2.0.0)
+    constraint: ""
+    # Prefixo para a tag (ex: hmg-, prd-)
+    tagPrefix: ""
+    # Atualizar automaticamente ou apenas detectar
+    autoUpdate: true
+
 service:
   app:
     port: 80
