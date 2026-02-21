@@ -66,7 +66,7 @@ spec:
         resources:
           {{- toYaml .Values.initContainerResources | nindent 10 }}
         {{- end }}
-        {{- if or .Values.initContainer.env.plain .Values.env.plain .Values.configMap.enabled .Values.secret.enabled .Values.secrets.enabled }}
+        {{- if or .Values.initContainer.env.plain .Values.env.plain .Values.configMap.enabled .Values.secret.enabled }}
         env:
         {{- if .Values.initContainer.env.plain }}
         {{- range .Values.initContainer.env.plain }}
@@ -105,7 +105,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.app.targetPort }}
-        {{- if or .Values.env.plain .Values.configMap.enabled .Values.secret.enabled .Values.secrets.enabled }}
+        {{- if or .Values.env.plain .Values.configMap.enabled .Values.secret.enabled }}
         env:
         {{- range .Values.env.plain }}
         - name: {{ .name }}
