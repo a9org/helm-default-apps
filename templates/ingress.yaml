@@ -42,7 +42,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: {{ include "app.fullname" . }}-app
+            name: {{ include "app.fullname" . }}
             port:
               number: {{ .Values.service.app.port | default 80 }}
   tls:
