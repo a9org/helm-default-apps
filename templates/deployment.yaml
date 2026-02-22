@@ -66,7 +66,7 @@ spec:
         resources:
           {{- toYaml .Values.initContainerResources | nindent 10 }}
         {{- end }}
-        {{- if or .Values.initContainer.env.plain .Values.env.plain .Values.configMap.enabled .Values.secret.enabled }}
+        {{- if or .Values.initContainer.env.plain .Values.env.plain .Values.configMap.enabled .Values.secret.enabled .Values.externalSecret.enabled }}
         env:
         {{- if .Values.initContainer.env.plain }}
         {{- range .Values.initContainer.env.plain }}
@@ -98,6 +98,11 @@ spec:
         {{- end }}
         {{- end }}
         {{- end }}
+        {{- if .Values.externalSecret.enabled }}
+        envFrom:
+        - secretRef:
+            name: {{ .Values.externalSecret.name }}
+        {{- end }}
       {{- end }}
       containers:
       - name: {{ include "app.name" . }}
@@ -105,7 +110,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.app.targetPort }}
-        {{- if or .Values.env.plain .Values.configMap.enabled .Values.secret.enabled }}
+        {{- if or .Values.env.plain .Values.configMap.enabled .Values.secret.enabled .Values.externalSecret.enabled }}
         env:
         {{- range .Values.env.plain }}
         - name: {{ .name }}
@@ -129,6 +134,11 @@ spec:
               key: {{ $key }}
         {{- end }}
         {{- end }}
+        {{- end }}
+        {{- if .Values.externalSecret.enabled }}
+        envFrom:
+        - secretRef:
+            name: {{ .Values.externalSecret.name }}
         {{- end }}
         {{- if .Values.probes.readiness.enabled }}
         readinessProbe:

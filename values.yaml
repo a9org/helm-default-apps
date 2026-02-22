@@ -107,6 +107,11 @@ secret:
     # DATABASE_PASSWORD: mypassword
     # API_KEY: myapikey
 
+# Referência a secret externo (criado fora do Helm)
+externalSecret:
+  enabled: false
+  name: ""  # Nome do secret K8s existente
+
 env:
   # Variáveis de ambiente diretas (não vêm do ConfigMap ou Secret)
   plain: []
