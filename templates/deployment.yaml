@@ -142,7 +142,7 @@ spec:
         {{- end }}
         {{- if .Values.probes.readiness.enabled }}
         readinessProbe:
-          tcpSocket::
+          tcpSocket:
             port: {{ .Values.service.app.targetPort }}
           initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
           periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
@@ -152,7 +152,7 @@ spec:
         {{- end }}
         {{- if .Values.probes.liveness.enabled }}
         livenessProbe:
-          tcpSocket::
+          tcpSocket:
             port: {{ .Values.service.app.targetPort }}
           initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
           periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
