@@ -142,10 +142,8 @@ spec:
         {{- end }}
         {{- if .Values.probes.readiness.enabled }}
         readinessProbe:
-          httpGet:
-            path: {{ .Values.probes.readiness.path }}
+          tcpSocket::
             port: {{ .Values.service.app.targetPort }}
-            scheme: HTTP
           initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
           periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
           timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
@@ -154,10 +152,8 @@ spec:
         {{- end }}
         {{- if .Values.probes.liveness.enabled }}
         livenessProbe:
-          httpGet:
-            path: {{ .Values.probes.liveness.path }}
+          tcpSocket::
             port: {{ .Values.service.app.targetPort }}
-            scheme: HTTP
           initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
           periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
           timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
