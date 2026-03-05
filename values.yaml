@@ -5,6 +5,14 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
+# Comando e argumentos do container principal
+container:
+  command: []
+    # - sh
+    # - -c
+  args: []
+    # - echo 'Starting app' && npm start
+
 # Labels adicionais para pods e deployment
 labels: {}
   # team: platform
