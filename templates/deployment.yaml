@@ -28,11 +28,11 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: {{ include "app.name" . }}
+      app: {{ include "app.fullname" . }}
   template:
     metadata:
       labels:
-        app: {{ include "app.name" . }}
+        app: {{ include "app.fullname" . }}
         {{- with .Values.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -47,11 +47,11 @@ spec:
         whenUnsatisfiable: {{ .Values.topologySpreadConstraints.whenUnsatisfiable }}
         labelSelector:
           matchLabels:
-            app: {{ include "app.name" . }}
+            app: {{ include "app.fullname" . }}
       {{- end }}
       {{- if .Values.initContainer.enabled }}
       initContainers:
-      - name: {{ include "app.name" . }}-init
+      - name: {{ include "app.fullname" . }}-init
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- if .Values.initContainer.command }}

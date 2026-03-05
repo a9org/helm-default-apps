@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "app.fullname" . }}
   labels:
-    app: {{ include "app.name" . }}
+    app: {{ include "app.fullname" . }}
 data:
   {{- range $key, $value := .Values.configMap.data }}
   {{ $key }}: {{ $value | quote }}

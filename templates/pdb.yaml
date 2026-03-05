@@ -17,5 +17,5 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: {{ include "app.name" . }}
+      app: {{ include "app.fullname" . }}
 {{- end }}
